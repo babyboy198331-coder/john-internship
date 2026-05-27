@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import useNewItems from "../../hooks/useNewItems";
 import OwlCarousel from "react-owl-carousel";
@@ -18,14 +18,14 @@ const options = {
 };
 
 const Countdown = ({ expiryDate }) => {
-  const getTimeLeft = () => {
+  const getTimeLeft = useCallback(() => {
     const diff = expiryDate - Date.now();
     if (diff <= 0) return null;
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     return `${h}h ${m}m ${s}s`;
-  };
+  }, [expiryDate]);
 
   const [timeLeft, setTimeLeft] = useState(getTimeLeft());
 
@@ -35,7 +35,7 @@ const Countdown = ({ expiryDate }) => {
       setTimeLeft(getTimeLeft());
     }, 1000);
     return () => clearInterval(timer);
-  }, [expiryDate]);
+  }, [expiryDate, getTimeLeft]);
 
   if (!timeLeft) return null;
   return <div className="de_countdown">{timeLeft}</div>;
@@ -108,11 +108,7 @@ const NewItems = () => {
                         </div>
                       </div>
                       <Link to={`/item-details/${item.nftId}`}>
-                        <img
-                          src={item.nftImage}
-                          className="lazy nft__item_preview"
-                          alt={item.title}
-                        />
+                        <img src={item.nftImage} className="lazy nft__item_preview" alt={item.title} />
                       </Link>
                     </div>
                     <div className="nft__item_info">
